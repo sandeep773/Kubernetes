@@ -1,0 +1,8 @@
+Daemonset is one of the controllers in Kubernetes, it ensures a particular pod is running in all nodes of the cluster.
+
+When a new node is added to the cluster it will add the pod to the new node and when a node is removed from the cluster, those Pods are garbage collected.
+
+Typical uses:
+1, Storage daemons (e.g. glusterd)
+2, Log collectors (e.g. fluentd)
+3, Monitoring daemons (e.g. Prometheus Node Exporter)
