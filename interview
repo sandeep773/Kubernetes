@@ -21,3 +21,6 @@ A. REST APIs are stateless because, rather than relying on the server rememberin
 
 Is LDAP stateless?
 LDAP connections are stateful and persistent, which means they must be opened before operations are performed and then closed when no longer needed.
+
+why replicaset has hash value ? 
+when replicaset set will be created it will give type as name (type=app) and older also has type as name (type=app) so how will it get to know which pod is of which replicaset so kubernetes deployment provides unique value replicaset for difference which is called hash value
