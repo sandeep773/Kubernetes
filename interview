@@ -1,0 +1,23 @@
+Difference deployment and replicaset: deployment follow the statergy of rolling update and replicaset follow the statergy of recreate. when we need to change the version then in replicaset all replica goes to 0 which cause some downtime but in case of deployment it follow rolling update.
+
+Diffrence between deployment and demaonset: Daemonset will not run more than one replica per node. Another advantage of using a Daemonset is that, if you add a node to the cluster, then the Daemonset will automatically spawn a pod on that node, which a deployment will not do.
+
+Difference between replicaset and daemonset: ReplicaSets should be used when your application is completely decoupled from the node and you can run multiple copies on a given node without special consideration. DaemonSets should be used when a single copy of your application must run on all or a subset of the nodes in the cluster.
+
+Difference between deployment and statefulset: In a deployment, the replicas all share a volume and PVC, while in a StatefulSet each pod has its own volume and PVC.
+
+DaemonSet:  ensures that all (or some) Nodes run a copy of a Pod. As nodes are added to the cluster, Pods are added to them.
+
+PersistentVolumeClaim (PVC):  is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory).
+
+Does StatefulSet create ReplicaSet?
+As a StatefulSet does not create a ReplicaSet, the pod replicas cannot be rolled back to previous versions. StatefulSets are typically used for applications that require persistent storage for stateful workloads, and ordered, automated rolling updates.
+
+Difference between StatefulSet and stateless?
+A StatefulSet is better suited to stateful workloads that require persistent storage on each cluster node, such as databases and other identity-sensitive workloads. A Deployment, on the other hand, is suitable for stateless workloads that use multiple replicas of one pod, such as web servers like Nginx and Apache.
+
+Is REST API stateless or stateful? 
+A. REST APIs are stateless because, rather than relying on the server remembering previous requests, REST applications require each request to contain all of the information necessary for the server to understand it.
+
+Is LDAP stateless?
+LDAP connections are stateful and persistent, which means they must be opened before operations are performed and then closed when no longer needed.
