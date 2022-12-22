@@ -24,3 +24,8 @@ LDAP connections are stateful and persistent, which means they must be opened be
 
 why replicaset has hash value ? 
 when replicaset set will be created it will give type as name (type=app) and older also has type as name (type=app) so how will it get to know which pod is of which replicaset so kubernetes deployment provides unique value replicaset for difference which is called hash value
+
+Volume create filesystem inside the pod thats why we dont use volume.and we dont want that because if pod get deleted complete date will be deleted.
+to overcome volume we use persistent volume.
+
+persistent volume exist in local machine thats why its not deleted only pod get deleted.
