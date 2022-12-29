@@ -1,3 +1,43 @@
 ifconfig -a : this will show all the network interfaces.
 cat /etc/network/interfaces :  this will show all the network interfaces.(Physical interface)
 ip link : this will show all physical links.
+
+Q. what is the IP address assign to the master node on this interface ? 
+Ans : ip link : this will get the eth3(2 value)
+      ifconfig eth3 : this will give ip address.
+      
+      
+ Q. what is the mac address of the of the interface on master node ? 
+ Ans. ip link : this will give output >> ens3 >> mac address will be after the link/ether (b4:45:06:61:0e:31)
+ 
+ Q. what is the IP address assigned to node01 ? 
+ 
+Ans.  ssh node01 ifconfig ens3 : this will ssh to node01 and will give output (inet 172.17.20.0)
+
+Q. what is the mac address assigned to node 01 ? 
+
+Ans. ssh node01 ifconfig ens3 : (ether b4:45:06:61:0e:31).
+
+Q. We use docker as our container runtime what is the interface/bridge created by docker on this host ? 
+
+Ans. ssh node01 ifconfig -a : docker 0
+
+Q. What is the state of interface docker0 ? 
+
+Ans. ssh node01 ip link : check for docker0 interface up or down. 
+
+Q. if you ping google.com from master node, which route does it take? what is the IP address of default gateway ? 
+
+Ans. ip r  OR ip route  : 
+
+Q. what is the port the kube scheduler is listning on in the master node ? 
+
+Ans. netstat -natulp | grep kube-scheduler
+
+Q. Notice that ETCD is listining on two ports. which of these have more count client connection established ? 
+
+Ans. netstat -natulp | grep etcd | grep LISTEN
+
+
+
+
