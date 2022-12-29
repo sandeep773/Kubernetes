@@ -38,6 +38,22 @@ Q. Notice that ETCD is listining on two ports. which of these have more count cl
 
 Ans. netstat -natulp | grep etcd | grep LISTEN
 
+Q. What is the networking solution used by this cluster ? 
+
+Ans. ps aux | grep kubelet  >>> this will show output cni 
+     ls /etc/cni/net.d/10-weave.conflist
+     
+ Q. How many weave agents /peers are deployed in this cluster ? 
+ 
+ Ans. kubectl get nodes -n kube-system
+ 
+ Q. on which node the weave peer present ? 
+ 
+ Ans. kubectl get nodes -n kube-system -o wide 
+ 
+=== k exec imagename --ip route   OR     k exec imagename --route -n   >>>> will show default gateway route 
+
+
 
 
 
