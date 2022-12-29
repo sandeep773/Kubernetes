@@ -1,0 +1,3 @@
+ifconfig -a : this will show all the network interfaces.
+cat /etc/network/interfaces :  this will show all the network interfaces.(Physical interface)
+ip link : this will show all physical links.
