@@ -54,6 +54,23 @@ Ans. ps aux | grep kubelet  >>> this will show output cni
 === k exec imagename --ip route   OR     k exec imagename --route -n   >>>> will show default gateway route 
 
 
+Q. To check service cluster IP range ?
+
+Ans.  cd /etc/kubernetes/manifests
+      ls 
+      cat kube-apiserver.yml   check for service cluster IP range here in file.
+      
+Q. How many kube-proxy pods are deployend in this cluster ? 
+Ans. k get pods
+
+Q. What type of proxy is the kube-proxy configured to use ?
+
+Ans. by default it uses iptables >>> we can validate this in logs of kube-proxy >> kubectl -n kube-system logs podsname
+      
+      
+   
+
+
 
 
 
