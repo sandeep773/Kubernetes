@@ -1,0 +1,24 @@
+👉 10 most common reasons for a kubernetes deployment failure summarized and explained by Ross Kukulinski in 2017 which are still relevant:
+
+🔸 Wrong Container Image or Invalid Registry Permissions
+🔸 Application Crashing after Launch
+🔸 Missing ConfigMap or Secret
+🔸 Liveness/Readiness Probe Failure
+🔸 Exceeding CPU/Memory Limits
+🔸 Resource Quotas
+🔸 Insufficient Cluster Resources
+🔸 PersistentVolume fails to mount
+🔸 Validation Errors (Invalid Yaml or invalid entries in the spec)
+🔸 Container Image Not Updating (due to ImagePullPolicy)
+
+Most of the deployment failures can be debugged by using the following commands:
+
+✍ kubectl describe deployment/<deployname>
+✍ kubectl describe replicaset/<rsname>
+✍ kubectl get pods
+✍ kubectl describe pod/<podname>
+✍ kubectl logs <podname> --previous
+
+📖 Detailed blog links:
+🔗 https://lnkd.in/gmuis4dX
+🔗 https://lnkd.in/gJm8Vi6C
