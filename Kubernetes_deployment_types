@@ -1,0 +1,32 @@
+Five Types of Kubernetes Application Deployment Strategies:
+
+✅ Recreate Deployment
+👉 A recreate deployment strategy is an all-or-nothing process that lets you update an application immediately, with some downtime
+👉 In this type of very simple deployment, all of the old pods are killed all at once and get replaced all at once with the new ones.
+👉 A recreate strategy is suitable for development environments, or when users prefer a short period of downtime.
+👉 At one time, only a single version of application will be running.
+
+✅ Rolling (Ramped) Deployment
+👉 The rolling deployment is the standard default deployment to Kubernetes.
+👉 It works by slowly, one by one, replacing pods of the previous version of your application with pods of the new version without any cluster downtime.
+👉 The advantages of a rolling deployment are that it is relatively easy to roll back, is less risky than a recreate deployment, and is easier to implement.
+
+✅ Blue/Green (Red/Black) Deployment
+👉 In a blue/green deployment strategy (sometimes referred to as red/black) the old version of the application (blue) and the new version (green) get deployed at the same time. 
+👉 A blue/green (or red/black) deployment strategy enables you to deploy a new version while avoiding downtime. 
+👉 When both of these are deployed, users only have access to the blue; whereas, the green is available to your QA team for test automation on a separate service or via direct port-forwarding.
+👉 This strategy requires double resources for both deployments and can incur high costs. 
+
+✅ Canary Deployment
+👉 A canary deployment strategy enables you to test a new application version on a real user base without committing to a full rollout. It involves using a progressive delivery model that initiates a phased deployment. 
+👉 Typically, a canary strategy gradually deploys a new application version to the Kubernetes cluster, testing it on a small amount of live traffic (small subset of live users). 
+👉 While this deploy strategy can be done just using Kubernetes resources by replacing old and new pods, it is much more convenient and easier to implement this strategy with a service mesh like Istio.
+
+✅ A/B Testing Deployment
+👉 A/B testing refers to canary deployments that distribute traffic to different versions of an application based on certain parameters.
+👉 A typical canary deployment routes users based on traffic weights, whereas A/B testing can target specific users based on cookies, user agents, or other parameters.
+
+Few helpful links to understand the above kubernetes deployment strategies in more detail:
+🔗 Codefresh : https://lnkd.in/gg8SGz_N
+🔗 Weaveworks : https://lnkd.in/gnCgnZjF
+🔗 Container Solutions : https://lnkd.in/gsKVEaYs
