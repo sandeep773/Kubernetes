@@ -1,0 +1,39 @@
+💁‍♂️ Three Types of Kubernetes Probes (Health Checks) You Must Know in Detail:
+
+✅ Readiness Probe
+✅ Liveness Probe
+✅ Startup Probe
+
+✴ Kubernetes Probes are used to detect:
+👉 Containers that haven’t started yet and can’t serve traffic.
+👉 Containers that are overwhelmed and can’t serve additional traffic.
+👉 Containers that are completely dead and not serving any traffic.
+
+
+✅ Liveness Probe
+👉 It indicates whether the container is running inside a pod
+👉 If the liveness probe fails, the kubelet kills the container, and the container is subjected to its restart policy.
+👉 If a container does not provide a liveness probe, the default state is Success.
+👉 If app is healthy, Kubernetes will not interfere with pod functioning. If app is unhealthy, Pod will be marked as unhealthy. If a Pod fails health-checks continuously, the Kubernetes terminates the pod and starts a new one.
+
+
+✅ Readiness Probe
+👉 It indicates whether the container is ready to respond to requests.
+👉 Readiness probes let Kubernetes know when your app (running in a container inside Pod) is ready to serve traffic.
+👉 If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. 
+👉 Unlike a liveness probe, a readiness probe doesn’t kill the container. If the readiness probe fails, Kubernetes simply hides the container’s Pod from corresponding Services, so that no traffic is redirected to it.
+👉 A side-effect of using Readiness Probes is that they can increase the time it takes to update Deployments.
+
+
+✅ Startup Probe
+👉 It indicates whether the application within the container is started.
+👉 Startup probe has higher priority over the two other probe types. All other probes are disabled if a startup probe is provided, until it succeeds.
+👉 If the startup probe fails, the kubelet kills the container, and the container is subjected to its restart policy.
+👉Startup probes are useful in situations where your app can take a long time to start, or could occasionally fail on startup.
+
+💠 Some really helpful links to understand kubernetes probes in detail:
+🔗 Kubernetes Probes Overview (by Ashish Patel): https://lnkd.in/g8dNM-Rk
+🔗 Types of Probes (K8s official documentation) https://lnkd.in/gevygPSf
+🔗 Kubernetes Liveness Probe (By Daniel Slavin ) : https://lnkd.in/gDmANWAe
+🔗 Kubernetes Readiness Probe (By
+Guy Menachem ) : https://lnkd.in/gmSTjnBh
