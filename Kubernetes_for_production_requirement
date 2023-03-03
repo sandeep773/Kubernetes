@@ -1,0 +1,21 @@
+💁‍♂️ For running Kubernetes (k8s) in Production, 6 most important things you need to setup first:
+
+1️⃣ Infrastructure as Code (IaC)
+👉 You must manage your cloud infrastructure using Infrastructure as Code to have a desired state configuration. There are many IaC tools available, however, I would personally recommend Terraform due to extensive community support.
+
+2️⃣ Monitoring & Centralized logging
+👉 Without a proper monitoring and logging setup, it will be very difficult to debug any production issue as kubernetes being very distributed in nature. You can use prometheus, grafana, elasticsearch, fluentd, filebeat etc in your monitoring and logging setup.
+
+3️⃣ Centralized Ingress Controller with SSL certificate management
+👉 Ingress in kubernetes handles how the traffic from outside cluster will be reaching to the application. It is basically the entrypoint to your applications from outside the k8s cluster. Another important thing here is to allow HTTPS access for enhanced security and ssl certificate must be setup for this. There are multiple options like Nginx-ingress, Istio ingress etc.
+
+4️⃣ Role-Based Access Control (RBAC)
+👉 Kubernetes provides multiple namespaces for isolations and also supports access control for each and every operation on any k8s objects. In order to keep access to your cluster secure, it is always recommended to use Role-Based Access control (RBAC) and provide limited access to the users.
+
+5️⃣ GitOps Deployments
+👉 There is an easy way to deploy anything on kubernetes i.e. kubectl apply. However, this is not scalable and won't work in a large team. The best deployment solution for kubernetes is GitOps model deployments. Push your manifests files to a git repo and then let it go through another tool or a CICD for the deployment. ArgoCD and Flux are the most widely used tools for GitOps deployment.
+
+6️⃣ Secrets Management
+👉 Kubernetes provides a native secrets, however, this is not secure enough. It is just base64 encoded and can be decoded easily by anyone having k8s secret access. For secrets management, we need to integrate some other solution where the secrets can be stored securely and encrypted. Hashicorp vault is now becoming the defacto for managing secrets in kubernetes.
+
+🔗 The above 6 points are summarized by Hijmen Fokker in the blog https://lnkd.in/g6h72TmP
