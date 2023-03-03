@@ -1,0 +1,22 @@
+The Kubernetes Scheduler is a core component of the Kubernetes control plane. After a user or a controller creates a Pod, the Kubernetes Scheduler will assign the Pod to a Node. Then, the Kubelet, on that node, will execute the Pod.
+
+🔶 At a high level, the Kubernetes scheduler does the following:
+✅ At the beginning, every pod that needs scheduling gets added to a queue.
+✅ When new pods are created, they are also added to the queue.
+✅ The scheduler continuously takes pods off that queue and schedules them.
+
+❄ There are 3 steps involved in scheduling a pod to a node by Kubernetes Scheduler:
+
+1️⃣ FILTERING
+👉 In this step, the scheduler finds the set of Nodes where it's feasible to schedule the Pod. 
+👉 In a cluster, Nodes that meet the scheduling requirements for a Pod are called feasible nodes. If none of the nodes are suitable, the pod remains unscheduled until the scheduler is able to place it.
+👉 For example, the PodFitsResources filter checks whether a candidate Node has enough available resource to meet a Pod's specific resource requests.
+
+2️⃣SCORING
+👉In this step, the scheduler ranks the feasible nodes to choose the most suitable node for Pod placement.
+👉The scheduler assigns a score to each Node that survived filtering based on active scoring rules.
+
+3️⃣ BINDING
+👉The kube-scheduler assigns the Pod to the Node with the highest ranking.
+👉If there is more than one node with equal scores, kube-scheduler selects one of these at random.
+👉The scheduler then notifies the API server about this decision in a process called binding.
