@@ -1,0 +1,32 @@
+❄ There are 3 common methods of Autoscaling in Kubernetes which are classified into 2 categories:
+
+1️⃣ [ Pod-Based Autoscaling ]
+✅ Horizontal Pod AutoScaler (HPA)
+✅ Vertical Pod AutoScaler (VPA)
+
+2️⃣ [ Node-Based Autoscaling ]
+✅ Cluster AutoScaler
+
+Let's learn more about these scaling methods:
+
+✅ Horizontal Pod AutoScaler (HPA) (Scaling out)
+👉 HPA automatically updates a workload resource (such as a Deployment or StatefulSet), with the aim of automatically scaling the workload to match demand.
+👉 Horizontal scaling means that the response to increased load is to deploy more Pods and reduce the pod when the load is reduced.
+👉 For example, an HPA can be configured such that number of pods gets increased when the overall cpu usage reaches to 75%.
+👉 Horizontal pod autoscaling does not apply to objects that can't be scaled (for example: a DaemonSet.)
+
+✅ Vertical Pod AutoScaler (HPA) (Scaling up)
+👉 The Vertical Pod Autoscaler (VPA) can increase and decrease the CPU and memory resource requests of pod containers to better match the allocated cluster resource allotment to actual usage.
+👉 Because Kubernetes does not support dynamically changing the resource limits of a running pod, the VPA terminates pods that are using outdated limits and replaces them with new pods with updated limits.
+👉 The VPA cannot scale up the pod limits more than the node resources.
+
+✅ Cluster Autoscaler
+👉 This is a type of Node-based autoscaler. It scales up/down the number of nodes running in a k8s cluster.
+👉 For this, it uses the cloud provider APIs to create/destroy new nodes and attach/detach to the k8s cluster.
+👉 The cluster autoscaler loops through two main tasks: watching for unschedulable pods and computing if it could consolidate all currently deployed pods on a smaller number of nodes.
+👉 The autoscaler checks the cluster for pods that cannot be scheduled on any existing nodes because of inadequate CPU or memory resources or because the pod’s node affinity rules or taint tolerations do not match an existing node. 
+👉 If the cluster has unschedulable pods, the autoscaler will check its managed node pools to decide if adding a node would unblock the pod. If so, it will add a node if the node pool can be increased in size.
+
+Some more details and explanation about these autoscaling methods can be found in below links:
+🔗 https://lnkd.in/gR8Hxm7i
+🔗 https://lnkd.in/gtzPWigh
