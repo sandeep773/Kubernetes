@@ -1,0 +1,27 @@
+Are you configuring "Security Context" for your pods in your Kubernetes infrastructure?
+
+👉 A security context defines privilege and access control settings for a Pod or Container.
+
+There are many security context settings, however, according to Ian Lewis, here are 3 settings which must be applied to all the pods:
+
+✅ runAsUser: 1000
+👉 The runAsUser field specifies that for any Containers in the Pod.
+👉 If this field is omitted, the primary group ID of the containers will be root(0).
+👉 This must be set to any non-zero value to avoid running any process as root and thus security risk will be very low
+
+✅ readOnlyRootFilesystem: true
+👉 It mounts the container's root filesystem as read-only.
+👉 An immutable root filesystem can prevent malicious binaries being added to PATH and it's execution
+👉 Immutable filesystems will prevent your application writing to disk.
+👉 If there is any requirement to store any files to disk, then emptyDir volume or a persistent volumes can be attached to the pod.
+
+✅ allowPrivilegeEscalation: false
+👉 It controls whether a process can gain more privileges than its parent process. 
+👉 It directly controls whether the "no_new_privs" flag gets set on the container process.
+👉 It is always true when the container:
+🔹 is run as privileged, or
+🔹 has CAP_SYS_ADMIN
+
+👋 There are many such settings which can be set to secure your pods. You can check them out here: https://lnkd.in/gHMj2Rnv
+
+👋 Checkout the kubernetes docs for security context reference: https://lnkd.in/gGKv-Qb6
