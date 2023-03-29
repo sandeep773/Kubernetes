@@ -29,3 +29,4 @@ Volume create filesystem inside the pod thats why we dont use volume.and we dont
 to overcome volume we use persistent volume.
 
 persistent volume exist in local machine thats why its not deleted only pod get deleted.
+
