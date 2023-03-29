@@ -30,3 +30,5 @@ to overcome volume we use persistent volume.
 
 persistent volume exist in local machine thats why its not deleted only pod get deleted.
 
+aaa
+
