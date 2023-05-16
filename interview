@@ -30,5 +30,6 @@ to overcome volume we use persistent volume.
 
 persistent volume exist in local machine thats why its not deleted only pod get deleted.
 
-aaa
+How do I schedule a pod without a scheduler?
+You can manually assign pods to node itself. Well without a scheduler, to schedule pod is to set nodeName property in your pod definition file while creating a pod.
 
