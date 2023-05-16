@@ -33,3 +33,5 @@ persistent volume exist in local machine thats why its not deleted only pod get 
 How do I schedule a pod without a scheduler?
 You can manually assign pods to node itself. Well without a scheduler, to schedule pod is to set nodeName property in your pod definition file while creating a pod.
 
+Node Affinity ensures that pods are hosted on particular nodes.
+Pod Affinity ensures two pods to be co-located in a single node.
