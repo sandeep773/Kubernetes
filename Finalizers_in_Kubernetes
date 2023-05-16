@@ -1,0 +1,29 @@
+What are Finalizers in Kubernetes?
+
+✅ Finalizers are namespaced keys that tell Kubernetes to wait until specific conditions are met before it fully deletes resources marked for deletion.
+
+✅ When you delete a k8s object with finalizers specified, the k8s API marks the object for deletion by populating  .metadata.deletionTimestamp
+
+✅ The target object remains in the terminating state until the actions specified in the finalizers is complete. After completion, the controller removes the relevant finalizers from the target object.
+
+✅ When the metadata.finalizers field is empty, Kubernetes considers the deletion complete and deletes the object.
+
+
+🏁 How Finalizers Work?
+
+✅ The finalizers can be specified in `metadata.finalizers` field of a manifest file.
+
+✅ When you attempt to delete the resource with finalizers specified, the API server does the following:
+👉 Modifies the object to add a metadata.deletionTimestamp field with the time you started the deletion.
+👉 Prevents the object from being removed until its metadata.finalizers field is empty.
+👉 Returns a 202 status code (HTTP "Accepted")
+
+✅ The controller managing that finalizer notices the update to the object setting the metadata.deletionTimestamp, indicating deletion of the object has been requested.
+
+✅ The controller then attempts to satisfy the requirements of the finalizers specified for that resource. Each time a finalizer condition is satisfied, the controller removes that key from the resource's finalizers field.
+
+✅ When the finalizers field is emptied, an object with a deletionTimestamp field set is automatically deleted.
+
+✅ A common example of a finalizer is https://lnkd.in/gdWVhRbW, which prevents accidental deletion of PersistentVolume objects.
+
+🔗 Kubernetes Finalizers docs: https://lnkd.in/g9mhGdR7
