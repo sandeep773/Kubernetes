@@ -1,0 +1,12 @@
+A chat was initiated today because you would like some assistance to continue troubleshoot why pods doesn't have access to the internet.
+From our screenshare, we looked into the reason why pods doesn't seem to have internet access, and from some of the pods such as clusterAutocaler and coreDNS pods we saw that there was an issue connecting to the kubernetes service (kubernetes.default.svc.cluster.local).
+Over the screenshare we used dnsutils pod to troubleshoot and perform curl and nslookup queries [1]. We confirmed that by doing a CURL to the kubernetes service (kubernetes.default.svc.cluster.local) and got a timeout. We then also checked the kubernetes endpoints and tried directly performing CURL to the pod-ip and the result was a success.
+From coreDNS logs we saw error connecting to 172.20.0.1 (i.e. kubernetes.default.svc.cluster.local) is due to IO timeouts and after confirming the security group rules are correct [2]. The only thing that could possibly cause an issue is kube-proxy and we confirmed that a very old version was running 1.20.7 where as the recommended version for EKS v1.25 is "v1.25.6-eksbuild.2" [3], and and after the upgrade of kube-proxy we can confirm everything started working as per normal again.
+In summary, it looks like that a step was missed during the upgrade from EKS v1.24 to v1.25. So I have also included a best practice upgrade guide fro EKS and hopefully it will help provide a checklist for the next upgrade.
+References:
+[1] https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/ 
+[2] Amazon EKS security group requirements and considerations - https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html 
+[3] Updating the Kubernetes <code class="code">kube-proxy</code> self-managed add-on - https://docs.aws.amazon.com/eks/latest/userguide/managing-kube-proxy.html 
+[4] https://aws.github.io/aws-eks-best-practices/upgrades/ 
+
+#########################################################################
