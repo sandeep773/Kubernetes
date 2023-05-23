@@ -35,3 +35,13 @@ You can manually assign pods to node itself. Well without a scheduler, to schedu
 
 Node Affinity ensures that pods are hosted on particular nodes.
 Pod Affinity ensures two pods to be co-located in a single node.
+
+1. Does traffic actually pass through kube proxy?
+
+2. Which component assigns IPs to the pods?
+
+3. Can components like kubelet, scheduler and kube proxy talk to etcd directly.
+
+4. If api server is not available for few seconds will it impact running pods?
+
+5. If the kube proxy dies for few second will it cause issue in existing traffic routing?
