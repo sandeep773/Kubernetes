@@ -1,0 +1,21 @@
+Types of Ingress in Kubernetes 👇
+
+1️⃣ Ingress backed by a single Service
+👉 An Ingress with a default backend with no rules
+👉 The defaultBackend will comprise of a single service and port.
+
+2️⃣ Simple fanout 
+👉 A fanout configuration routes traffic from a single IP address to more than one Service.
+👉 The routing is based on the HTTP URI being requested.
+👉 For example, example.com/foo and example.com/bar , traffic for both can be routed to different services by using an ingress.
+
+3️⃣ Name based virtual hosting 
+👉 Name-based virtual hosts support routing HTTP traffic to multiple host names at the same IP address.
+👉 An ingress can route traffic to two different services for example1.com and example2.com using an ingress.
+
+4️⃣ TLS
+👉 TLS ingress is used to secure an ingress using the certificates for the hosts.
+👉  The Ingress resource only supports a single TLS port 443.
+👉  TLS termination happens at the ingress point and traffic to the Service ( and its Pods) will be in plaintext.
+
+If you want to learn more in detail with ingress resource examples, kindly check out the below link of Kubernetes documentation.
