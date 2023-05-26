@@ -19,3 +19,6 @@ Types of Ingress in Kubernetes 👇
 👉  TLS termination happens at the ingress point and traffic to the Service ( and its Pods) will be in plaintext.
 
 If you want to learn more in detail with ingress resource examples, kindly check out the below link of Kubernetes documentation.
+
+✅ Reference:
+🔗 Kubernetes documentation: https://lnkd.in/gCRCp3W3
