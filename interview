@@ -48,3 +48,19 @@ Ans: No
 
 5. If the kube proxy dies for few second will it cause issue in existing traffic routing?
 Ans: No
+
+1. What is the relation between deployments, replicasets, and pods?
+Ans: A deployment configures a replicaset which will specify what configurarion will the pods have
+
+2. Can two containers in one pod talk to each other? If yes/no then why?
+Ans: yes, because they are two processes in the same machine, they can talk to eachother thru localhost but they cant use the same ports.
+
+3. Can you mention all the components of the control plane?
+Ans: api server, kubelet, kubeproxy, dns, etcd, scheduler
+
+4. Can you mention all the components required to run a worker node?
+Ans: kubelet and kubeproxy, CNI plugin
+
+5. Is etcd consistence or available?
+Ans: etcd is consistent, but is not HA.
+
