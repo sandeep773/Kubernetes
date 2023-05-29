@@ -1,0 +1,28 @@
+You might have used Persistent Volumes in Kubernetes but have you heard of "Projected Volumes" 🤔
+
+✅ A Projected Volume maps several existing volume sources into the same directory.
+
+✅ All sources are required to be in the same namespace as the Pod.
+
+✅ As of now, Projected volumes in Kubernetes supports following types of volume sources :
+
+1️⃣ secret
+👉 You can put the secrets at a specified path in the directory specified for the projected volume.
+
+2️⃣ downwardAPI
+👉 A downwardAPI volume makes downward API data available to applications. Within the volume, you can find the exposed data as read-only files in plain text format.
+👉 A container using the downward API as a subPath volume mount does not receive updates when field values change.
+👉 Using Projected volumes for downwardAPI will receive updates.
+
+3️⃣ configMap
+👉 A ConfigMap provides a way to inject configuration data into pods.
+👉 The data stored in a ConfigMap can be referenced in a volume of type configMap and then consumed by containerized applications running in a pod.
+
+4️⃣ serviceAccountToken
+👉 You can inject the token for the current service account into a Pod at a specified path.
+👉 Containers in this Pod can use that token to access the Kubernetes API server, authenticating with the identity of the pod's ServiceAccount.
+
+✅ A container using a projected volume source as a subPath volume mount will not receive updates for those volume sources.
+
+💡 Reference:
+🔗 Kubernetes Documentation: https://lnkd.in/gZepsbKr
