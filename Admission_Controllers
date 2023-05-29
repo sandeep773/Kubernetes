@@ -1,0 +1,50 @@
+What are "Admission Controllers" in Kubernetes 🤔
+⬇ 👇 ⬇
+
+✅ An admission controller is a piece of code that intercepts and processes requests to the Kubernetes API server prior to persistence of the object, but after the request is authenticated and authorized.
+
+✅ Admission controllers limit requests to create, delete, modify objects. Admission controllers do not (and cannot) block requests to read (get, watch or list) objects.
+
+✅ There are a few admission controllers are precompiled into "kube-apiserver" (Kubernetes version 1.27) and can be configured by cluster administrator:
+👉 CertificateApproval
+👉 CertificateSigning
+👉 CertificateSubjectRestriction
+👉 DefaultIngressClass
+👉 DefaultStorageClass
+👉 DefaultTolerationSeconds
+👉 LimitRanger
+👉 MutatingAdmissionWebhook
+👉 NamespaceLifecycle
+👉 PersistentVolumeClaimResize
+👉 PodSecurity
+👉 Priority
+👉 ResourceQuota
+👉 RuntimeClass
+👉 ServiceAccount
+👉 StorageObjectInUseProtection
+👉 TaintNodesByCondition
+👉 ValidatingAdmissionPolicy
+👉 ValidatingAdmissionWebhook
+
+✅ There are mainly three types or classes of Admission controllers:
+
+1️⃣ Validating admission controllers
+👉 These controllers validates the API object to make sure all conditions are met for that object. If all conditions are met, the object gets the permission to pass and finally persists to etcd.
+
+2️⃣ Mutating admission controllers
+👉 These controllers may modify related objects to the requests they admit.
+
+3️⃣ Mutating + Validating admission controllers
+👉 These controllers are responsible for both: mutation and validation.
+👉 These types of controllers mutates objects, if needed, and then validates it.
+
+✅ The admission control process proceeds in two phases:
+1️⃣ In the first phase, mutating admission controllers are run.
+2️⃣ In the second phase, validating admission controllers are run.
+
+✅ If any of the controllers in either phase reject the request, the entire request is rejected immediately and an error is returned to the end-user.
+
+References:
+Kubernetes Docs: https://lnkd.in/gP93hRn6
+Kubernetes Blog: https://lnkd.in/gqAEHHGw
+Sysdig Blog: https://lnkd.in/gaPkNdpn
