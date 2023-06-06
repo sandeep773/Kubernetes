@@ -66,6 +66,8 @@ Ans: etcd is consistent, but is not HA.
 
 1. When you have a lot of services which mode of kube proxy is preferred to use? iptables or IPVS
 Ans: IPVS - as ipvs doesn't increase the iptable rules at a pace of iptables , for higher service more scalable
+Using iptables for large deployments will create latency in pod startup because for every operation update ,create ,delete iptables insert and update rules which makes it slow.
+That's why people trying to switch from kube-proxy itself and want to use eBPF based tech like cilium.
 
 2. Who is responsible for doing health checks on the containers?
 Ans: Kubelet
@@ -75,9 +77,12 @@ Ans: overlay networking - wrapping some layers of network over the existing tcp-
 
 4. How will you scale coredns[DNS Resolution] for large deployments?
 Ans: we can cache the results of dns queries to specific nodes , using Nodelocal DNS , reducing the load on coreDNS making it scalable 
+We can use dns-autoscaler ,coredns plugins for different use-cases and as Abhay said we can tune this params as well.
 
 5. What is a CSI?
 Ans: Container storage interface 
+Using CSI, third-party storage providers can write and deploy plugins exposing new storage systems in Kubernetes without ever having to touch the core Kubernetes code. This gives Kubernetes users more options for storage and makes the system more secure and reliable.
+That's why now with eks v.123 you have to have EBS CSI driver which is necessary.
 
 
 
