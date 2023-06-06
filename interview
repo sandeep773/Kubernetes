@@ -64,3 +64,20 @@ Ans: kubelet and kubeproxy, CNI plugin
 5. Is etcd consistence or available?
 Ans: etcd is consistent, but is not HA.
 
+1. When you have a lot of services which mode of kube proxy is preferred to use? iptables or IPVS
+Ans: IPVS - as ipvs doesn't increase the iptable rules at a pace of iptables , for higher service more scalable
+
+2. Who is responsible for doing health checks on the containers?
+Ans: Kubelet
+
+3. What is an overlay network?
+Ans: overlay networking - wrapping some layers of network over the existing tcp-ip stack
+
+4. How will you scale coredns[DNS Resolution] for large deployments?
+Ans: we can cache the results of dns queries to specific nodes , using Nodelocal DNS , reducing the load on coreDNS making it scalable 
+
+5. What is a CSI?
+Ans: Container storage interface 
+
+
+
