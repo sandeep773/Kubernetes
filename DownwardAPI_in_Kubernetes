@@ -1,0 +1,22 @@
+Have you heard of "DownwardAPI" in Kubernetes?
+If not, then Let's see how to use this in Kubernetes 👇
+
+✅ What is DownwardAPI?
+👉 The downward API allows containers to consume information about themselves or the cluster without using the Kubernetes client or API server.
+👉 It is sometimes useful for a container to have information about itself, without being overly coupled to Kubernetes.
+👉 Example: Suppose you want the Pod's name as an environment variable in the container. DownwardAPI in kubernetes help us to get that information easily.
+
+✅ How to expose Pod and container fields to a running container?
+There are 2 ways:
+
+1️⃣ As environment variables
+👉 You can inject the required information as environment variable in the container using the "fieldRef".
+👉 Refer the image for an example.
+👉 You can try it yourself by following the steps provided at https://lnkd.in/gXPzzPzN
+
+2️⃣ As files in a downwardAPI volume
+👉 Instead of using environment variables, you can also write the required info into file(s) using the DownwardAPI Volume feature.
+👉 Check the example in the image with this post.
+👉 You can try it yourself by following the steps provided at https://lnkd.in/gefpHsBE
+
+✍ Let me know in comments what all info you would want to pass to the containers using this feature.
