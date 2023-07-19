@@ -1,3 +1,5 @@
+Multi-stage Docker builds is that it reduces the number of dependencies and unnecessary packages in the image, reducing the attack surface and improving security. In addition, it keeps the build clean and lean by having only the things required to run your application in production.
+
 Difference deployment and replicaset: deployment follow the statergy of rolling update and replicaset follow the statergy of recreate. when we need to change the version then in replicaset all replica goes to 0 which cause some downtime but in case of deployment it follow rolling update.
 
 Diffrence between deployment and demaonset: Daemonset will not run more than one replica per node. Another advantage of using a Daemonset is that, if you add a node to the cluster, then the Daemonset will automatically spawn a pod on that node, which a deployment will not do.
