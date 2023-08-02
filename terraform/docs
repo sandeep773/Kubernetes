@@ -1,0 +1,66 @@
+Metrics server is a util which provides us the capability to expose cluster,pods metrics which helps us in autoscaling the resources
+Deploy the Metrics Server
+execute the below command:-
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+2. Verify that the metrics-server deployment is running the desired number of pods with the following command.
+kubectl get deployment metrics-server -n kube-system
+
+############################################
+
+Updating eks cluster from 1.24 to 1.25
+Prerequisite:-
+Before proceeding with update please go through the mentioned link below:-
+Amazon EKS networking add-ons - Amazon EKS 
+We need to take care of 3 components which are essential i.e. aws-node, coredns and kube-proxy
+Steps to Proceed:-
+Update the image tag version of all the 3 components i.e. aws-node, coredns and kube-proxy.
+image tags are as follows:-
+aws-node:- v1.12.6-eksbuild.1 (in case of aws-node image tag needs to be updated at 2 places)
+coredns:- v1.9.3-eksbuild.3
+kube-proxy:- v1.25.6-eksbuild.2
+We can find them in kube-system namespace, to update and image tag version simple execute
+kubectl edit deployment coredns -n kube-system
+kubectl edit daemonset aws-node -n kube-system
+kubectl edit daemonset kube-proxy -n kube-system
+2. Once updated please wait for the pods to get stable.
+3. Now proceed for extra add-ons installation, make sure below mentioned addons are installed
+a. Amazon VPC CNI:- v1.10.4-eksbuild.1
+b. Amazon EBS CSI Driver:- v1.17.0-eksbuild.1
+
+Steps to install add-ons:-
+Go to aws console and search eks and click on cluster name
+
+Scroll down and click on addons and clck get more addons
+3. Select the addons listed above and the version i.e. Amazon VPC CNI:- v1.10.4-eksbuild.1 and Amazon EBS CSI Driver:- v1.17.0-eksbuild.1.
+4. Select inherit from node and scroll down and choose overwrite
+5. Click on save and wait for add-ons to install.
+Changes at Terraform level:-
+Update the version in local.tf
+
+2. In node.tf update the ami id of version 1.25 along with vpc-cni policy as shown below:-
+3. Save the changes and do terraform apply and wait for the changes to take effect.
+4. Once done go to particular autoscaling group, select instance refresh and in health % choose 90.
+5. Start instance refresh and wait for it to complete as it will do rolling update on your worker node.
+6. Once done login to control plane server and execute
+kubectl get nodes
+kubectl get pods -n kube-system
+kubectl get pods -n ingress-controller
+kubectl get pdos -n <application-namespace>
+
+Setup Aws Node Termination Handler
+Node termination helps in managing the spot nodes, it works as a daemon set and keeps an eye on spot nodes, now whenever any spot node will be terminated so before 2 minutes of getting terminated it will send signal to kubernetes master and informs that no new pod should be scheduled on this node, along with this it will schedule the current pods to other worker node if found idle else cluster autoscaler will be triggered and new node will be spawned.
+Deploy aws node termination:-
+It has been taken care of with helm chart, please follow our gitlab for same:-
+https://gitlab.mbkinternal.in/devops/infra/terraform/-/tree/DEVOPS-7581-npci-eks/mk-prod/non-pci/eks-utils/aws-node-termination-handler
+
+Setup Internal nginx ingress controller
+We will be setting up ingress controller in order to route the traffic and expose our services via single load balancer, here we are using nginx ingress controller with internal NLB.
+We have done the setup via helm chart it can be found in terraform repo(https://gitlab.mbkinternal.in/devops/infra/terraform/-/tree/master/mk-prod/non-pci/eks-utils/ingress-nginx)
+Here we have created values-internal-nocpci.yaml, in order to create your ingress controller make a copy of this file and do required changes which incudes load balacer type, acm for internal https routing, internal schema etc as shown below:-
+once done save the file and apply the chart by
+kubectl create ns ingress-controller
+helm upgrade --install internal-ingress -f ingress-nginx/<values-file.yaml> ingress-nginx/ -n ingress-controller
+once done please check your load balancer in aws console it should be an internal network load balancer.
+
+
+ 
