@@ -1,5 +1,9 @@
 kubernetes: url for all commands https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+Node Affinity ensures that pods are hosted on particular nodes.
+
+Pod Affinity ensures two pods to be co-located in a single node.
+
 Multi-stage Docker builds is that it reduces the number of dependencies and unnecessary packages in the image, reducing the attack surface and improving security. In addition, it keeps the build clean and lean by having only the things required to run your application in production.
 
 Difference deployment and replicaset: deployment follow the statergy of rolling update and replicaset follow the statergy of recreate. when we need to change the version then in replicaset all replica goes to 0 which cause some downtime but in case of deployment it follow rolling update.
