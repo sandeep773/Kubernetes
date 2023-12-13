@@ -4,6 +4,13 @@ Node Affinity ensures that pods are hosted on particular nodes.
 
 Pod Affinity ensures two pods to be co-located in a single node.
 
+ETCD : which store information about cluster
+kube scheduler: which is used to schedule application or container on nodes 
+replication controller and contrller manager or node controller: which take care of controller
+kube api-server: orchestraing all operation with in cluster
+kubelet(worker node): which listen for instruction and manages container 
+kube proxy (worker node): enable communication between services with in cluster.
+
 Multi-stage Docker builds is that it reduces the number of dependencies and unnecessary packages in the image, reducing the attack surface and improving security. In addition, it keeps the build clean and lean by having only the things required to run your application in production.
 
 Difference deployment and replicaset: deployment follow the statergy of rolling update and replicaset follow the statergy of recreate. when we need to change the version then in replicaset all replica goes to 0 which cause some downtime but in case of deployment it follow rolling update.
