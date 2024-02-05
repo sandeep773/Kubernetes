@@ -99,6 +99,8 @@ Ans: Container storage interface
 Using CSI, third-party storage providers can write and deploy plugins exposing new storage systems in Kubernetes without ever having to touch the core Kubernetes code. This gives Kubernetes users more options for storage and makes the system more secure and reliable.
 That's why now with eks v.123 you have to have EBS CSI driver which is necessary.
 
+Containerd: 
+containerd is a mid-level container runtime. Simply put, it is a daemon that manages the complete container lifecycle on a single host: creates, starts, and stops containers, pulls and stores images, configures mounts and networking, etc.
 
 
 
