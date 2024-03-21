@@ -52,6 +52,7 @@ Node Affinity ensures that pods are hosted on particular nodes.
 Pod Affinity ensures two pods to be co-located in a single node.
 
 1. Does traffic actually pass through kube proxy?
+Ans: The Kube-Proxy agent doesn't receive the actual traffic or do any load balancing. This agent is only part of the control plane that creates the Service rules. If we're talking about the rules that Kube-Proxy creates, the answer is yes.
 
 2. Which component assigns IPs to the pods?
 Ans: virtual network interface  (Calico assigns pod IPs.)
