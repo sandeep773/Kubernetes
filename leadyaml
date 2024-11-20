@@ -1,0 +1,395 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: zaakpay-lead-prod
+ namespace: prod
+ annotations:
+   eks.amazonaws.com/role-arn: arn:aws:iam::562098676362:role/zaakpay-lead-prod-eks-execution-role
+   eks.amazonaws.com/sts-regional-endpoints: "true"
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: zaakpay-lead-prod
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+       app: zaakpay-lead-prod
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: zaakpay-lead-prod
+    spec:
+      serviceAccountName: zaakpay-lead-prod
+      terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 60
+            preference:   
+              matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - spot
+          - weight: 40
+            preference:
+              matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+      containers:
+      - name: zaakpay-lead-prod-container
+        image: 562098676362.dkr.ecr.ap-south-1.amazonaws.com/zaakpay-lead-service-prod:BUILD_NUMBER
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+        livenessProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 20
+        startupProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          periodSeconds: 20
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 30
+        volumeMounts:
+          - name: zaakpay-lead-prod-logs
+            mountPath: /opt/app/logs
+          - name: zaakpay-lead-prod-conf
+            mountPath: /var/install/zaakpay/config/application.properties
+            subPath: application.properties
+      - name: zaakpay-lead-prod-logs
+        image: 562098676362.dkr.ecr.ap-south-1.amazonaws.com/firelense:fluent-bit3.0 
+        volumeMounts:
+        - name: zaakpay-lead-prod-logs
+          mountPath: /opt/app/logs
+        - name: zaakpay-lead-prod-loging-conf
+          mountPath: /fluent-bit/etc/fluent-bit.conf
+          subPath: fluent-bit.conf
+      volumes:
+        - name: zaakpay-lead-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-lead-prod-loging-conf
+          name: zaakpay-lead-prod-loging-conf
+        - name: zaakpay-lead-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-lead-prod-conf
+          name: zaakpay-lead-prod-conf
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: zaakpay-lead-newrelic
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+       app: zaakpay-lead-newrelic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zaakpay-lead-newrelic
+    spec:
+      serviceAccountName: zaakpay-lead-prod
+      terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 60
+            preference:   
+              matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - spot
+          - weight: 40
+            preference:
+              matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+      containers:
+      - name: zaakpay-lead-newrelic-container
+        image: 562098676362.dkr.ecr.ap-south-1.amazonaws.com/zaakpay-lead-newrelic:BUILD_NUMBER
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+        livenessProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 20
+        startupProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          periodSeconds: 20
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health/status
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 30
+        volumeMounts:
+          - name: zaakpay-lead-prod-logs
+            mountPath: /opt/app/logs
+          - name: zaakpay-lead-prod-conf
+            mountPath: /var/install/zaakpay/config/application.properties
+            subPath: application.properties
+      - name: zaakpay-lead-prod-logs
+        image: 562098676362.dkr.ecr.ap-south-1.amazonaws.com/firelense:fluent-bit3.0 
+        volumeMounts:
+        - name: zaakpay-lead-prod-logs
+          mountPath: /opt/app/logs
+        - name: zaakpay-lead-prod-loging-conf
+          mountPath: /fluent-bit/etc/fluent-bit.conf
+          subPath: fluent-bit.conf
+      volumes:
+        - name: zaakpay-lead-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-lead-prod-loging-conf
+          name: zaakpay-lead-prod-loging-conf
+        - name: zaakpay-lead-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-lead-prod-conf
+          name: zaakpay-lead-prod-conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zaakpay-lead-prod-loging-conf
+  namespace: prod
+data:
+  fluent-bit.conf: |-
+    [SERVICE]
+        Flush   2
+        Log_Level   debug
+    [INPUT]
+        Name                tail
+        Path                /opt/app/logs/app.log
+        Tag                 zaakpay-lead-prod
+        DB                  /var/log/flb_service.db
+        DB.locking          true
+        Skip_Long_Lines     On
+        Refresh_Interval    10
+        Rotate_Wait         30
+    [FILTER]
+        Name record_modifier
+        Match *
+        Record hostname ${HOSTNAME}
+    [OUTPUT]
+        name                   loki
+        match                  zaakpay-lead-prod
+        host                   loki-live.zaakpay.in
+        port                   3100
+        labels                 job=zaakpay-lead-prod
+        label_keys             $sub['stream']
+        auto_kubernetes_labels on
+    [OUTPUT]
+        Name                  s3
+        Match                 zaakpay-lead-prod
+        bucket                zaakpay-application-blackhole-non-pci-s3
+        region                ap-south-1
+        total_file_size       50M
+        s3_key_format         /zaakpay-lead/$TAG/%Y/%m/%d/%H/%M/$UUID.gz
+        s3_key_format_tag_delimiters .-
+        compression           gzip
+        use_put_object        On
+        upload_timeout        60m
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zaakpay-lead-prod-conf
+  namespace: prod
+data:
+  application.properties: |-
+    spring.application.name=Zaakpay-Lead-Service
+    server.servlet.context-path=/api
+    spring.application.admin.enabled=false
+    spring.servlet.multipart.max-request-size=100MB
+    spring.servlet.multipart.max-file-size=100MB
+    server.compression.enabled=true
+    server.compression.min-response-size=1024
+
+    auth.app.id=1000
+    auth.app.key=becc14329eca4553
+    xAppKey=8f4a15e6b7c2d9f31a0e2b5c8d7f6e3
+    xAppId=1002
+    auth.app.host=https://auth.zaakpay.in
+    server.port=8080
+
+    management.endpoints.web.exposure.include=prometheus
+
+    mysql.lead.jdbcUrl=jdbc:mysql://zaakpay-payment-rds.zaakpay.in:3316/zaakpay_leads?useSSL=false
+    mysql.lead.user=leads_rw
+    mysql.lead.password=1GCeJC#DrJFFP2#
+    mysql.lead.driverClass=com.mysql.cj.jdbc.Driver
+    mysql.lead.initialPoolSize=5
+    mysql.lead.minPoolSize=5
+    mysql.lead.maxPoolSize=25
+    mysql.lead.idleConnectionTimeout=100
+    mysql.lead.abandonedConnectionTimeout=1000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zaakpay-lead-prod
+  namespace: prod
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: zaakpay-lead-prod
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zaakpay-lead-newrelic
+  namespace: prod
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: zaakpay-lead-newrelic
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  zaakpay-lead-prod
+  namespace: prod
+  annotations:
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      underscores_in_headers on;
+      if ($uri ~* "/actuator") {
+        return 403;
+      }
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+ ingressClassName: nonpci-external-nginx
+ rules:
+  - host: lead.zaakpay.com
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: zaakpay-lead-prod
+            port:
+              number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  zaakpay-lead-prod-newrelic
+  namespace: prod
+  annotations:
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      underscores_in_headers on;
+      if ($uri ~* "/actuator") {
+        return 403;
+      }
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+ ingressClassName: nonpci-external-nginx
+ rules:
+  - host: lead.zaakpay.com
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: zaakpay-lead-newrelic
+            port:
+              number: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: zaakpay-lead-prod
+  namespace: prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: zaakpay-lead-prod
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: zaakpay-lead-prod
+  namespace: prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: zaakpay-lead-prod
