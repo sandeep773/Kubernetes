@@ -1,0 +1,359 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: zaakpay-auth-prod
+ namespace: prod
+ annotations:
+   eks.amazonaws.com/role-arn: arn:aws:iam::100831699389:role/zaakpay-auth-prod-eks-execution-role
+   eks.amazonaws.com/sts-regional-endpoints: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zaakpay-auth-prod
+  namespace: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zaakpay-auth-prod
+  template:
+    metadata:
+      labels:
+        app: zaakpay-auth-prod
+    spec:
+      serviceAccountName: zaakpay-auth-prod
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - zaakpay-auth-prod
+      containers:
+      - name: zaakpay-auth-prod
+        image: 100831699389.dkr.ecr.ap-south-1.amazonaws.com/zaakpay-auth-prod:BUILD_NUMBER
+        resources:
+          requests:
+            memory: "2.5Gi"
+            cpu: "500m"
+          limits:
+            memory: "4.5Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 5
+        startupProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 20
+        readinessProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 5
+        volumeMounts:
+          - name: zaakpay-auth-prod-logs
+            mountPath: /opt/app/logs
+      - name: zaakpay-auth-prod-logs
+        image: 100831699389.dkr.ecr.ap-south-1.amazonaws.com/fluent-bit:3.0-debug
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+          - name: zaakpay-auth-prod-logs
+            mountPath: /opt/app/logs
+          - name: zaakpay-auth-prod-logs-conf
+            mountPath: /fluent-bit/etc/fluent-bit.conf
+            subPath: fluent-bit.conf
+      volumes:
+        - name: zaakpay-auth-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-auth-prod-logs-conf
+          name: zaakpay-auth-prod-logs-conf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zaakpay-auth-newrelic
+  namespace: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zaakpay-auth-newrelic
+  template:
+    metadata:
+      labels:
+        app: zaakpay-auth-newrelic
+    spec:
+      serviceAccountName: zaakpay-auth-prod
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+      containers:
+      - name: zaakpay-auth-newrelic
+        image: 100831699389.dkr.ecr.ap-south-1.amazonaws.com/zaakpay-auth-prod-newrelic:BUILD_NUMBER
+        resources:
+          requests:
+            memory: "2.5Gi"
+            cpu: "500m"
+          limits:
+            memory: "4.5Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 5
+        startupProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 20
+        readinessProbe:
+          httpGet:
+            path: /auth/health/status
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 5
+        volumeMounts:
+          - name: zaakpay-auth-prod-logs
+            mountPath: /opt/app/logs
+      - name: zaakpay-auth-prod-logs
+        image: 100831699389.dkr.ecr.ap-south-1.amazonaws.com/fluent-bit:3.0-debug
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+          - name: zaakpay-auth-prod-logs
+            mountPath: /opt/app/logs
+          - name: zaakpay-auth-prod-logs-conf
+            mountPath: /fluent-bit/etc/fluent-bit.conf
+            subPath: fluent-bit.conf
+      volumes:
+        - name: zaakpay-auth-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: zaakpay-auth-prod-logs-conf
+          name: zaakpay-auth-prod-logs-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zaakpay-auth-prod
+  namespace: prod
+spec:
+  selector:
+    app: zaakpay-auth-prod
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zaakpay-auth-newrelic
+  namespace: prod
+spec:
+  selector:
+    app: zaakpay-auth-newrelic
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zaakpay-auth-prod-logs-conf
+  namespace: prod
+data:
+  fluent-bit.conf: |-
+    [SERVICE]
+        Flush   5
+        Grace   30
+        Log_Level   info
+        Parsers_File /fluent-bit/etc/parsers.conf
+
+    [INPUT]
+        Name                tail
+        Path                /opt/app/logs/app.log
+        Tag                 zaakpay-auth-prod
+        DB                  /var/log/flb_service.db
+        Parser              json
+        DB.locking          true
+        Skip_Long_Lines     On
+        Refresh_Interval    10
+        Rotate_Wait         30
+    [OUTPUT]
+        Name    		  loki
+        Match   		  zaakpay-auth-prod
+        Host    		  loki-live.zaakpay.in
+        Port    		  3100
+        labels            job=zaakpay-auth-prod
+        label_keys        $sub['stream']
+
+    [OUTPUT]
+        Name                  s3
+        Match                 zaakpay-auth-prod
+        bucket                zaakpay-application-blackhole-pci-s3
+        region                ap-south-1
+        total_file_size       50M
+        s3_key_format         /zaakpay-auth/$TAG/%Y/%m/%d/%H/%M/$UUID.gz
+        s3_key_format_tag_delimiters .-
+        compression           gzip
+        use_put_object        On
+        upload_timeout        60m
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  zaakpay-auth-prod
+  namespace: prod
+  annotations:
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/cors-allow-headers: content-type, x-mclient, token, authorization
+    nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      underscores_in_headers on;
+      if ($uri ~* "/actuator") {
+        return 403;
+      }
+spec:
+ ingressClassName: pci-internal-nginx
+ rules:
+  - host: auth.zaakpay.in
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: zaakpay-auth-prod
+            port:
+              number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  zaakpay-auth-prod-newrelic
+  namespace: prod
+  annotations:
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+    nginx.ingress.kubernetes.io/cors-allow-headers: content-type, x-mclient, token, authorization
+    nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      underscores_in_headers on;
+      if ($uri ~* "/actuator") {
+        return 403;
+      }
+spec:
+ ingressClassName: pci-internal-nginx
+ rules:
+  - host: auth.zaakpay.in
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: zaakpay-auth-newrelic
+            port:
+              number: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: zaakpay-auth-prod
+  namespace: prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: zaakpay-auth-prod
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 55
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 65
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-zaakpay-auth
+  namespace: prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: zaakpay-auth-prod
