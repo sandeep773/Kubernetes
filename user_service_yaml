@@ -1,0 +1,369 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: user-service-prod
+ namespace: prod
+ annotations:
+   eks.amazonaws.com/role-arn: arn:aws:iam::693798407829:role/user-service-prod-eks-execution-role
+   eks.amazonaws.com/sts-regional-endpoints: "true"
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: user-service-prod
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+       app: user-service-prod
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: user-service-prod
+    spec:
+      serviceAccountName: user-service-prod
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+      terminationGracePeriodSeconds: 90
+      containers:
+      - name: user-service-prod-container
+        image: 693798407829.dkr.ecr.ap-south-1.amazonaws.com/user-service-prod:BUILD_NUMBER
+        imagePullPolicy: "IfNotPresent"
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "6Gi"
+            cpu: "4000m"
+            ephemeral-storage: "30Gi"
+          limits:
+            memory: "8Gi"
+            cpu: "5000m"
+            ephemeral-storage: "50Gi"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 20
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          periodSeconds: 20
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 90
+          timeoutSeconds: 20
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 30
+        volumeMounts:
+          - name: user-service-prod-logs
+            mountPath: /var/install/mobikwik
+      - name: user-service-prod-logs
+        image: fluent/fluent-bit:3.0-debug
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "50m"
+        volumeMounts:
+          - name: user-service-prod-logs
+            mountPath: /var/install/mobikwik
+          - name: user-service-prod-logs-conf
+            mountPath: /fluent-bit/etc/fluent-bit.conf
+            subPath: fluent-bit.conf
+      volumes:
+        - name: user-service-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: user-service-prod-logs-conf
+          name: user-service-prod-logs-conf
+      imagePullSecrets:
+        - name: registry-secrets
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: user-service-prod-newrelic
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+       app: user-service-prod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-service-prod
+    spec:
+      serviceAccountName: user-service-prod
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node.kubernetes.io/lifecycle
+                operator: In
+                values:
+                - ondemand
+      containers:
+      - name: user-service-prod-newrelic
+        image: 693798407829.dkr.ecr.ap-south-1.amazonaws.com/user-service-prod-newrelic:BUILD_NUMBER
+        imagePullPolicy: "IfNotPresent"
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "6Gi"
+            cpu: "4000m"
+            ephemeral-storage: "30Gi"
+          limits:
+            memory: "8Gi"
+            cpu: "5000m"
+            ephemeral-storage: "50Gi"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          timeoutSeconds: 20
+          periodSeconds: 30
+          failureThreshold: 20
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          periodSeconds: 20
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 90
+          timeoutSeconds: 20
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 30
+        volumeMounts:
+          - name: user-service-prod-logs
+            mountPath: /var/install/mobikwik
+      - name: user-service-prod-logs
+        image: fluent/fluent-bit:3.0-debug
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "50m"
+        volumeMounts:
+          - name: user-service-prod-logs
+            mountPath: /var/install/mobikwik
+          - name: user-service-prod-logs-conf
+            mountPath: /fluent-bit/etc/fluent-bit.conf
+            subPath: fluent-bit.conf
+      volumes:
+        - name: user-service-prod-logs
+          emptyDir: {}
+        - configMap:
+            defaultMode: 420
+            name: user-service-prod-logs-conf
+          name: user-service-prod-logs-conf
+      imagePullSecrets:
+        - name: registry-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-prod
+  namespace: prod
+spec:
+  selector:
+    app: user-service-prod
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: user-service-prod-newrelic
+#   namespace: prod
+# spec:
+#   selector:
+#     app: user-service-prod-newrelic
+#   ports:
+#   - port: 8080
+#     targetPort: 8080    
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-prod-logs-conf
+  namespace: prod
+data:
+  fluent-bit.conf: |-
+    [SERVICE]
+        Flush   5
+        Grace   30
+        Log_Level   info
+        Parsers_File /fluent-bit/parsers/parsers.conf
+
+    [INPUT]
+        Name                tail
+        Parser              json
+        Path                /var/install/mobikwik/user-service/nohup.out,/var/install/mobikwik/application.info.log
+        Tag                 user-service-prod
+        DB                  /var/log/flb_service.db
+        DB.locking          true
+        Skip_Long_Lines     On
+        Refresh_Interval    10
+        Rotate_Wait         30
+
+    [OUTPUT]
+        Name    		  loki
+        Match   		  user-service-prod
+        Host    		  loki-live.mbkinternal.in
+        Port    		  3100
+        labels            job=user-service-prod
+        label_keys        $sub['stream']
+    [OUTPUT]
+        Name                  s3
+        Match                 user-service-prod
+        bucket                application-blackhole-non-pci-s3
+        region                ap-south-1
+        total_file_size       50M
+        s3_key_format         /user-service/$TAG/%Y/%m/%d/%H/%M/$UUID.gz
+        s3_key_format_tag_delimiters .-
+        compression           gzip
+        use_put_object        On
+        upload_timeout        60m
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  user-service-prod
+  namespace: prod
+  annotations:
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/cors-allow-headers: content-type, x-mclient, token, authorization
+    nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      underscores_in_headers on;
+      if ($uri ~* "/user-service/actuator/prometheus") {
+        return 403;
+      }
+spec:
+ ingressClassName: nonpci-internal-nginx
+ rules:
+  - host: user-service-prod.mbkinternal.in
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: user-service-prod
+            port:
+              number: 8080
+---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name:  user-service-newrelic
+#   namespace: prod
+#   annotations:
+#     kubernetes.io/tls-acme: "false"
+#     nginx.ingress.kubernetes.io/canary: "true"
+#     nginx.ingress.kubernetes.io/canary-weight: "20"
+#     nginx.ingress.kubernetes.io/cors-allow-headers: content-type, x-mclient, token, authorization
+#     nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS
+#     nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+#     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+#     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+#     nginx.ingress.kubernetes.io/send-timeout: "3600"
+#     nginx.ingress.kubernetes.io/server-snippet: |
+#       underscores_in_headers on;
+#       if ($uri ~* "/user-service/actuator/prometheus") {
+#         return 403;
+#       }
+# spec:
+#  ingressClassName: nonpci-internal-nginx
+#  rules:
+#   - host: user-service-prod.mbkinternal.in
+#     http:
+#       paths:
+#       - path: /
+#         pathType: ImplementationSpecific
+#         backend:
+#           service:
+#             name: user-service-prod-newrelic
+#             port:
+#               number: 8080
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-service-prod
+  namespace: prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-service-prod
+  minReplicas: 4
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: user-service
+  namespace: prod
+spec:
+  minAvailable: 4
+  selector:
+    matchLabels:
+      app: user-service-prod
