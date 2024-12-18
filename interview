@@ -107,4 +107,6 @@ containerd is a mid-level container runtime. Simply put, it is a daemon that man
 What is the difference between container image and VM image ?
 VMs run on a hypervisor, a software layer that sits between the underlying hardware and the virtualized environment. They provide strong isolation but are resource-intensive. Containers, on the other hand, sit on top of a physical server plus its host OS kernel and libraries, making them lightweight and fast to start.
 
+Container Orchestration refers to the automated management, scaling, and deployment of containerized applications. As applications grow in complexity and need to run across multiple machines or data centers, orchestration tools help to streamline and automate tasks like container deployment, scaling, load balancing, and resource allocation. The goal is to ensure that containers run reliably and efficiently in production environments.
 
+Some popular container orchestration platforms include Kubernetes, Docker Swarm, and Apache Mesos.
